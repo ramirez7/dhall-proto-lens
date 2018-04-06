@@ -1,0 +1,294 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package dhall;
+
+message Expr {
+  oneof ctors {
+    Const const = 1;
+    Var var = 2;
+    Lam lam = 3;
+    Pi pi = 4;
+    App app = 5;
+    Let let = 6;
+    Annot annot = 7;
+    Bool bool_ = 8;
+    BoolLit boolLit = 9;
+    BoolAnd boolAnd = 10;
+    BoolOr boolOr = 11;
+    BoolEQ boolEQ = 12;
+    BoolNE boolNE = 13;
+    BoolIf boolIf = 14;
+    Natural natural = 15;
+    NaturalLit naturalLit = 16;
+    NaturalFold naturalFold = 17;
+    NaturalIsZero naturalIsZero = 18;
+    NaturalEven naturalEven = 19;
+    NaturalOdd naturalOdd = 20;
+    NaturalToInteger naturalToInteger = 21;
+    NaturalShow naturalShow = 22;
+    NaturalPlus naturalPlus = 23;
+    NaturalTimes naturalTimes = 24;
+    Integer integer = 25;
+    IntegerLit integerLit = 26;
+    IntegerShow integerShow = 27;
+    Double double = 28;
+    DoubleLit doubleLit = 29;
+    DoubleShow doubleShow = 30;
+    Text text = 31;
+    TextLit textLit = 32;
+    TextAppend textAppend = 33;
+    List list = 34;
+    ListLit listLit = 35;
+    ListAppend listAppend = 36;
+    ListBuild listBuild = 37;
+    ListFold listFold = 38;
+    ListLength listLength = 39;
+    ListHead listHead = 40;
+    ListLast listLast = 41;
+    ListIndexed listIndexed = 42;
+    ListReverse listReverse = 43;
+    Optional optional = 44;
+    OptionalLit optionalLit = 45;
+    OptionalFold optionalFold = 46;
+    OptionalBuild optionalBuild = 47;
+    Record record = 48;
+    RecordLit recordLit = 49;
+    Union union = 50;
+    UnionLit unionLit = 51;
+    Combine combine = 52;
+    Prefer prefer = 53;
+    Merge merge = 54;
+    Constructors constructors = 55;
+    Field field = 56;
+    Embed embed = 57;
+  }
+}
+
+// Bodies of each constructor
+
+// Rec means AST recursion. It's an Any under the hood because we don't know what
+// other ASTs our top-level AST has been extended with.
+message Rec {
+  google.protobuf.Any rec = 1;
+}
+
+enum Const {
+  TYPE = 0;
+  KIND = 1;
+}
+
+message Var {
+  string name = 1;
+  fixed64 index = 2;
+}
+
+message Lam {
+  string label = 1;
+  Rec annot = 2;
+  Rec body = 3;
+}
+
+message Pi {
+  string label = 1;
+  Rec annot = 2;
+  Rec body = 3;
+}
+
+message App {
+  Rec f = 1;
+  Rec a = 2;
+}
+
+message Let {
+  string label = 1;
+  Rec annot = 2;
+  Rec body = 3;
+}
+
+message Annot {
+  Rec body = 2;
+  Rec annot = 3;
+}
+
+message Bool {}
+
+message BoolLit {
+  bool value = 1;
+}
+
+message BoolAnd {
+  Rec lhs = 1;
+  Rec rhs = 2;
+}
+
+message BoolOr {
+  Rec lhs = 1;
+  Rec rhs = 2;
+}
+
+message BoolEQ {
+  Rec lhs = 1;
+  Rec rhs = 2;
+}
+
+message BoolNE {
+  Rec lhs = 1;
+  Rec rhs = 2;
+}
+
+message BoolIf {
+  Rec cond = 1;
+  Rec yes = 2;
+  Rec no = 3;
+}
+
+message Natural {}
+
+message NaturalLit {
+  uint64 value = 1;
+}
+
+message NaturalFold {}
+
+message NaturalBuild {}
+
+message NaturalIsZero {}
+
+message NaturalEven {}
+
+message NaturalOdd {}
+
+message NaturalToInteger {}
+
+message NaturalShow {}
+
+message NaturalPlus {
+  Rec lhs = 1;
+  Rec rhs = 2;
+}
+
+message NaturalTimes {
+  Rec lhs = 1;
+  Rec rhs = 2;
+}
+
+message Integer {}
+
+message IntegerLit {
+  int64 value = 1;
+}
+
+message IntegerShow {}
+
+message Double {}
+
+message DoubleLit {
+  double value = 1;
+}
+
+message DoubleShow {}
+
+message Text {}
+
+message TextLit {
+  message chunk {
+    string text = 1;
+    Rec expr = 2;
+  }
+  repeated chunk chunks = 1;
+  string final = 2;
+}
+
+message TextAppend {
+  Rec lhs = 1;
+  Rec rhs = 2;
+}
+
+message List {}
+
+message ListLit {
+  Rec annot = 1;
+  repeated Rec value = 2;
+}
+
+message ListAppend {
+  Rec lhs = 1;
+  Rec rhs = 2;
+}
+
+message ListBuild {}
+
+message ListFold {}
+
+message ListLength {}
+
+message ListHead {}
+
+message ListLast {}
+
+message ListIndexed {}
+
+message ListReverse {}
+
+message Optional {}
+
+message OptionalLit {
+  Rec annot = 1;
+  Rec maybe = 2;
+}
+
+message OptionalFold {}
+
+message OptionalBuild {}
+
+message Record {
+  map<string, Rec> fields = 1;
+}
+
+message RecordLit {
+  map<string, Rec> fields = 1;
+}
+
+message Union {
+  map<string, Rec> fields = 1;
+}
+
+message UnionLit {
+  string tag = 1;
+  Rec value = 2;
+  map<string, Rec> others = 3;
+}
+
+message Combine {
+  Rec lhs = 1;
+  Rec rhs = 2;
+}
+
+message Prefer {
+  Rec lhs = 1;
+  Rec rhs = 2;
+}
+
+message Merge {
+  Rec lhs = 1;
+  Rec rhs = 2;
+  Rec annot = 3;
+}
+
+message Constructors {
+  Rec annot = 1;
+}
+
+message Field {
+  Rec record = 1;
+  string field = 2;
+}
+
+// Note s a is omitted. We will be converting this proto to Expr X a
+
+message Embed {
+  // This Any is *not* Rec. It is instead another proto of the Embedded terms
+  google.protobuf.Any embed = 1;
+}
